@@ -1,0 +1,66 @@
+// Deterinação da velocidade do som no ar
+
+#include <LiquidCrystal_I2C.h>   // Biblioteca para controlar o ecrã lcd
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+//Configuração do sensor de humidade e temperatura do ar
+#include <DHT.h>
+#include <DHT_U.h>
+#define DHTPIN A1
+#define DHTTYPE DHT22
+#define trigPin 10
+#define echoPin 9
+DHT dht(DHTPIN, DHTTYPE);
+
+//Definição de variáveis
+float tempo = 0;
+float T = 0;
+
+//Estabelecer o setup
+void setup() {
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+  lcd.setCursor(3, 0);
+  lcd.print("11F; AL 2.2");
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  dht.begin();
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (digitalRead(7) == HIGH) {  //o ciclo loop inicia ao pressionar o botão ligado no pino 7
+    for (int i = 1; i <= 10; i++) {    //Para cada medição do tempo entre a emissão e a deteção do sinal ultrassónico, fazer a média de 10 ensaios
+      digitalWrite(trigPin, LOW);
+      delayMicroseconds(10);
+      digitalWrite(trigPin, HIGH);
+      delayMicroseconds(10);
+      digitalWrite(trigPin, LOW);
+
+      tempo = tempo + pulseIn(echoPin, HIGH);
+      delay(30);
+    }
+    tempo = tempo / 10.;
+   
+    
+  T = dht.readTemperature(); //medir o valor da temperatura do ar
+
+//apressentar as medições no ecrã lcd
+    lcd.clear();
+    lcd.setBacklight(1);
+    lcd.setCursor(0, 0);
+    lcd.print("t=");
+    lcd.print(tempo / 1000., 3);
+    lcd.print(" ms");
+    lcd.setCursor(0, 1);
+    lcd.print("T=");
+    lcd.print(T, 1);
+    lcd.print(" C");
+  
+  // Uma pequena pausa e repor a 0 o valor das variáveis
+    delay(1000);
+    tempo = 0;
+    T = 0;
+  }
+}
