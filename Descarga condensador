@@ -1,6 +1,7 @@
 //Carga e descarga de um condensador
 //funciona com o suplemnto do excel Transmissor de dados
 //os alunos podem tratar os dados diretamente no excel: regresão logarítmica; determinação da constante de tempo;...
+//ATENÇÃO: ligações mal planeadas podem provocar picos de corrente na porta usb do computador!!!
 
 int V1 = 0;
 int V2 = 0;
