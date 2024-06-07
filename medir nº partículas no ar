@@ -1,0 +1,51 @@
+/* *******************************************************
+   Projeto para medir a concentração de partículas no ar
+   com  a placa Grove Beginner Kit
+******************************************************* */
+
+#include <Arduino.h>
+#include <U8x8lib.h>
+#include <Wire.h>                                                  // Bibliteca que controla o ecrã OLED imbutido na placa
+U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/U8X8_PIN_NONE);  //Configuração do ecrã OLED
+
+int pin = 2;  //O sensor de partículas no ar liga na porta D2
+unsigned long duracao;
+unsigned long tempoinicial;
+unsigned long tempoamostra_ms = 60000;  //cada amostra é recolhida durante 30s ;
+unsigned long tempomedido = 0;
+float ratio = 0;
+float concentracao = 0;
+
+void setup() {
+  Serial.begin(9600);
+  Wire.begin();
+  u8x8.begin();
+  u8x8.setPowerSave(0);
+  u8x8.setFlipMode(1);
+  pinMode(pin, INPUT);
+  tempoinicial = millis();  //guarda o instante atual em milissegundos;
+}
+
+void loop() {
+  duracao = pulseIn(pin, LOW);
+  tempomedido = tempomedido + duracao;
+
+  if ((millis() - tempoinicial) > tempoamostra_ms)  // enquanto não passam 30 s
+  {
+    ratio = tempomedido / (tempoamostra_ms * 100.0);                                   // percentagem de tempo com o sensor a detetar partículas 0=>100
+    concentracao = 3.80 * pow(ratio, 3) - 20.7 * pow(ratio, 2) + 1900 * ratio + 13.7;  // usando a curva em:https://seeeddoc.github.io/Grove-Dust_Sensor/res/Grove-Dust_sensor.pdf
+    u8x8.clearDisplay();                                                               //Limpa qualquer valor inscrito previamente no ecrã
+    u8x8.setFont(u8x8_font_pxplusibmcga_f);                                            //configra o tipo de letra.
+    //Outro tipos de letra em https://github.com/olikraus/u8g2/wiki/fntlist8x8
+    u8x8.setCursor(0, 0);
+    u8x8.print("Concentracao:");
+
+    u8x8.setCursor(0, 10);
+    u8x8.print(concentracao, 0);
+
+    u8x8.setCursor(0, 20);
+    u8x8.print("particulas/L");
+    tempomedido = 0;
+    tempoinicial = millis();
+  }
+}
