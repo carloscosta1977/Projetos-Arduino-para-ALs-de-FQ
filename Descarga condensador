@@ -1,0 +1,46 @@
+//Carga e descarga de um condensador
+//funciona com o suplemnto do excel Transmissor de dados
+//os alunos podem tratar os dados diretamente no excel: regresão logarítmica; determinação da constante de tempo;...
+
+int V1 = 0;
+int V2 = 0;
+unsigned long tempo = 0;
+unsigned long temporeset;
+float temposegundos;
+float U = 0;
+//float perc = 0;
+
+
+void setup() {
+  pinMode(A1, INPUT);         // lê o valor V1 no condensador
+  pinMode(A2, INPUT);         // lê o valor V2 no condensador
+  pinMode(13, INPUT_PULLUP);  // controlo do início de medições
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  while (digitalRead(13) == HIGH) {
+    temporeset = millis();
+  }
+
+  if (digitalRead(13) == LOW) { // Basta ligar um fio do GND ao pino 13
+
+    V1 = analogRead(A1);
+    V2 = analogRead(A2);
+    U = ((V1 - V2) * 5. / 1023.);  // ddp nos terminais do condsensador
+
+    tempo = millis() - temporeset;
+    temposegundos = tempo / 1000.;
+
+    //perc = U *100 / 5.;  // percentagem de carga do condesador
+
+    Serial.print(U, 3);
+    Serial.print(",");
+    //Serial.print(perc);
+    //Serial.print(",");
+    Serial.println(temposegundos, 3);
+
+    delay(40);
+  }
+}
