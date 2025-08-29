@@ -1,4 +1,5 @@
 // Deterinação da velocidade do som no ar
+// projeto no tinkercad: https://www.tinkercad.com/things/8pQpBB8hbgs-velocidade-do-som 
 
 #include <LiquidCrystal_I2C.h>   // Biblioteca para controlar o ecrã lcd
 LiquidCrystal_I2C lcd(0x27, 16, 2);
